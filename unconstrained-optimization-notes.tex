@@ -1,0 +1,642 @@
+\documentclass[a4paper, 10pt, twocolumn]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{geometry}
+\geometry{
+	left=2cm,
+	right=2cm,
+	top=2cm,
+	bottom=2cm
+}
+\setlength\parindent{0pt}
+\setlength{\columnsep}{20pt}
+
+\usepackage{multicol}
+
+\usepackage{amssymb, amsmath, amsthm, enumitem}
+
+\theoremstyle{definition}
+\newtheorem*{defn}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{prop}[theorem]{Proposition}
+ 
+\theoremstyle{remark}
+\newtheorem*{note}{Note}
+
+\newcommand{\al}{\alpha}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\N}{\mathcal{N}}
+
+\usepackage{lipsum}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{sectsty}
+\definecolor{Vermillon}{HTML}{E34234}
+\definecolor{SpaceCadet}{HTML}{202C59}
+\sectionfont{\color{Vermillon}}
+\subsectionfont{\color{Mahogany}}
+\subsubsectionfont{\color{SpaceCadet}}
+
+
+\begin{document}
+
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{5pt}
+
+
+
+\section{Fundamentals}
+
+
+\subsection{Optimality conditions}
+
+\begin{theorem}[Taylor's Theorem]
+Suppose that $f : \R^n \rightarrow \R$ is continuously differentiable ($f \in \C^1$) and that $d \in \R^n$ and $\al \in \R$. Then we have that
+
+$$
+f(x+\al d) \approx f(x) + \al\nabla f(x)^Td
+$$
+
+and, if $f \in \C^2$, we also have that
+
+$$
+f(x+\al d) \approx f(x) + \al\nabla f(x)^Td + \frac{1}{2}\al^2d^T\nabla^2f(x)d.
+$$
+\end{theorem}
+
+\begin{theorem} [First Order Necessary Conditions]
+If $x^*$ is a local minimizer and $f$ is continuously differentiable in an open neighbourhood of $x^*$, then $\mathbf{\nabla f(x^*) = 0}$.
+\end{theorem}
+
+\begin{theorem} [Second Order Necessary Conditions]
+If $x^*$ is a local minimizer and $\nabla^2f$ is continuous in an open neighbourhood of $x^*$, then $\nabla f(x^*) = 0$ and $\mathbf{\nabla^2f(x^*)}$ \textbf{is positive semidefinite}.
+\end{theorem}
+
+\begin{theorem}[Second Order Sufficient Conditions]
+Suppose that $\nabla^2f$ is continuous in an open neighbourhood of $x^*$ and that $\nabla f(x^*) = 0$ and $\mathbf{\nabla^2f(x^*)}$ \textbf{is positive definite}. Then $x^*$ is a strict local minimizer of $f$.
+
+\begin{proof}
+Given that $\nabla^2f(x^*)$ is positive definite, $d^T\nabla^2f(x^*)d > 0 \ \forall d \in \R^n$. Hence, we can apply Taylor's Theorem.
+\end{proof}
+
+\end{theorem}
+
+
+\subsection{Descent direction}
+
+\begin{defn} [Directional derivative]
+If $f : \R^n \rightarrow \R$ is continuously differentiable ($f \in \C^1$) and $d \in \R^n$, then the \textit{directional derivative} of $f$ in the direction $d$ is given by
+
+$$
+D(f(x); d) \stackrel{\text{def}}{=} \lim_{\epsilon \rightarrow 0} \frac{f(x +\epsilon d) - f(x)}{\epsilon} = \nabla f(x)^T d.
+$$
+
+To verify this formula, we define the function
+
+$$
+\phi(\alpha) = f(x +\alpha d) = f(y(\alpha)), 
+$$
+
+where $y(\alpha) = x + \alpha d$. Note that
+
+$$
+\lim_{\epsilon \rightarrow 0} \frac{f(x +\epsilon d) - f(x)}{\epsilon} =
+\lim_{\epsilon \rightarrow 0} \frac{\phi(\epsilon) - \phi(0)}{\epsilon} = 
+\phi'(0).
+$$
+
+By applying the chain rule to $f(y(\alpha))$ we obtain
+
+\begin{align*}
+\phi'(\alpha) &= \sum_{i=1}^{n} \frac{\partial f(y(\alpha))}{\partial y_i}\nabla y_i(\alpha) \\
+              &= \sum_{i=1}^{n} \frac{\partial f(y(\alpha))}{\partial y_i}d_i \\
+              &= \nabla f(x + \alpha d)^Td.
+\end{align*}
+\end{defn}
+
+
+\begin{prop}
+$\nabla f(x)^Td < 0 \Rightarrow d$ is a descent direction for $f$ from x.
+\end{prop}
+
+\newpage
+
+
+\subsection{Line Search}
+
+\begin{defn}
+Let $f, x$ and $d$. Line search is the procedure to find the optimal step length
+$$
+\al^* \stackrel{\text{def}}{=} \arg\min_{\al>0}\{\phi(\al) = f(x+\al d) \}.
+$$
+\end{defn}
+
+\begin{prop}[Exact line search]
+Let $f(x) = \frac{1}{2}x^TQx - b^Tx$ be a convex quadratic function. Then, 
+
+$$
+\al^* = -\frac{(Qx-b)^Td}{d^TQd}.
+$$
+
+\begin{proof}
+\begin{align*}
+\phi(\al) &= \frac{1}{2}(x+\al d)^TQ(x+\al d) - b^T(x-\al d)\\
+&= \bigg(\frac{1}{2}d^TQd\bigg)\al^2 + \bigg((x^TQ-b^T)d\bigg)\al + f(x).
+\end{align*}
+Hence,
+$$
+\phi'(\al) = 0 \Leftrightarrow \al^* = -\frac{(Qx-b)^Td}{d^TQd}.
+$$
+\end{proof}
+\end{prop}
+
+\begin{defn}[Wolfe Conditions]
+\
+\begin{itemize}
+\item Sufficient decrease (\textbf{WC1}):
+\vspace{5pt}
+$$
+f(x +\al d) \leq f(x) + c_1\al\nabla f(x)^Td
+$$
+\item Curvature condition (\textbf{WC2}):
+\vspace{5pt}
+\begin{align*}
+f(x+\al d)^Td &\geq c_2\nabla f(x)^Td \\
+\phi'(\al) &\geq c_2\phi'(0)
+\end{align*}
+\end{itemize}
+\end{defn}
+
+\begin{defn}[Strong Wolfe Conditions]
+\
+\begin{itemize}
+\item Curvature condition (\textbf{SWC2}):
+\vspace{5pt}
+$$
+| f(x+\al d)^Td | \leq c_2| \nabla f(x)^Td |
+$$
+\end{itemize}
+\end{defn}
+
+
+\subsection{Global convergence}
+
+\begin{defn}
+An optimization algorithm is said to be globally convergent if $\{x^k\} \underset{k\rightarrow\infty}{\longrightarrow}x^*$, i.e. if
+\vspace{5pt}
+$$
+\lim_{k\rightarrow\infty}||\nabla f(x^k)|| = 0.
+$$
+\end{defn}
+
+We will discuss one key property: the angle $\theta^k$ between $d^k$ and the steepest descent direction $-\nabla f(x^k)$, defined by:
+
+$$
+-\nabla f(x^k)^Td^k = || \nabla f(x^k) || || d^k || \cos\theta^k
+$$
+
+\begin{theorem}[Zoutendijk's Theorem]
+Consider any iteration of the form $x^k \leftarrow x^k + \al^kd^k$, where $d^k$ is a descent direction and $\al^k$ satisfies the Wolfe conditions. Suppose that $f$ is bounded below in $\R^n$ in an open set $\N$ containing the level set $\mathcal{L} \overset{\text{def}}{=}\{ x : f(x) \leq f(x^0)\}$, where $x^0$ is the starting point of the iteration. Assume also that the gradient $\nabla f$ is Lipschitz continuous on $\N$, that is, there exists a constant $L>0$ such that
+
+$$
+|| \nabla f(x) - \nabla f(\tilde{x}) || \leq || x-\tilde{x} || \ \forall x, \tilde{x} \in \N.
+$$
+
+Then
+
+\begin{equation}\label{eq: Zoutendijk}
+\sum_{k \geq 0} \cos^2\theta^k \ ||\nabla f(x^k) ||^2 < \infty.
+\end{equation}
+
+\end{theorem}
+
+\newpage
+
+Inequality (\ref{eq: Zoutendijk}), which we call the \textit{Zoutendijk condition}, implies that
+
+$$
+\cos^2\theta^k \ ||\nabla f(x^k) ||^2 \rightarrow 0.
+$$
+
+If our method for choosing the search direction $d^k$ ensures that the angle $d^k$ is bounded away from $90º$ (\textit{Convergent Angle Condition}), then there is a positive constant $\delta$ such that
+
+$$
+\cos\theta^k \geq \delta > 0 \ \forall k.
+$$
+
+It follows immediately that $\lim_{k\rightarrow\infty}||\nabla f(x^k)|| = 0$ and hence the sequence $\{ x^k \}$ is convergent.
+
+
+\subsection{Local convergence}
+
+\begin{defn}
+The local convergence of a globally convergent optimization algorithm is the order of convergence of the series $\{x^k\} \underset{k\rightarrow\infty}{\longrightarrow}x^*$.
+\end{defn}
+
+\begin{defn}
+Let $\{x^k\}$ be a sequence in $\R^n$ that converges to $x^*$. We say that the convergence is
+\begin{itemize}
+\item \textbf{linear} if there is a constant $r \in (0,1)$ such that
+\vspace{5pt}
+$$
+\frac{||x^{k+1}-x^*||}{||x^k-x^*||} \leq r \ \text{for all $k$ large enough}.
+$$
+\item \textbf{superlinear} if
+\vspace{5pt}
+$$
+\lim_{k \rightarrow \infty}\frac{||x^{k+1}-x^*||}{||x^k-x^*||} = 0.
+$$
+\item \textbf{quadratic} if there is a constant $M>0$ such that
+\vspace{5pt}
+$$
+\frac{||x^{k+1}-x^*||}{||x^k-x^*||^2} \leq M \ \text{for all $k$ large enough}.
+$$
+\end{itemize}
+\end{defn}
+
+
+
+\section{First Derivative Methods}
+
+
+\subsection{Gradient Method}
+
+$$
+\boxed{d^k = -\nabla f^k}
+$$
+
+The Gradient Method is globally convergent as every $d^k$ is a descent direction and $\cos\theta^k = 1 \ \forall k$.
+
+\subsubsection*{Local convergence for quadratic $f$}
+
+%Let $f(x) = \frac{1}{2}x^TQx-b^Tx$ and $d^k = -\nabla f^k = -(Qx^k -b)$.
+
+\begin{theorem}
+When the gradient method \textit{with exact line searches} is applied to a strongly convex quadratic function $f(x) = \frac{1}{2}x^TQx-b^Tx$, the error norm satisfies
+$$
+f^{k+1}-f^* \leq \bigg(\frac{\lambda_n-\lambda_1}{\lambda_n+\lambda_1}\bigg)^2(f^k-f^*)
+$$
+where $0 < \lambda_1 \leq \dots \leq \lambda_n$ are the eigenvalues of $Q$.
+\begin{proof}
+Apply the \textit{Kantorovich inequality} for symmetric positive definite matrices $Q$:
+$$
+\frac{(x^Tx)^2}{(x^TQx)(x^TQ^{-1}x)} \geq \frac{\lambda_1\lambda_n}{(\lambda_1+\lambda_n)^2}.
+$$
+\end{proof}
+\end{theorem}
+
+\subsubsection*{Local convergence for general nonlinear $f$}
+
+The same results as for quadratic functions hold, substituting $Q$ by $\nabla^2f^*$.
+
+\begin{prop}
+If the gradient method is applied with exact line search to a strictly convex quadratic function, $d^k \perp d^{k+1}$. This is not necessarily true if the quadratic function is not strictly convex.
+\begin{proof}
+It comes from the fact that
+$$
+\phi'(\al^*) = {\nabla f^{k+1}}^Td^k = 0.
+$$
+\end{proof}
+\end{prop}
+
+
+\subsection{Conjugate Gradient Method}
+
+$$
+\boxed{d^k = -\nabla f^k + \beta^kd^{k-1}}
+$$
+
+The most successful choices for the update coefficient $\beta^k$ are:
+
+\begin{itemize}
+\item \textbf{Fletcher-Reeves formulae}:
+\vspace{5pt}
+$$
+\beta^k_{FR} = \frac{|| \nabla f^k||}{||\nabla f^{k-1}||^2}
+$$
+\item \textbf{Polak-Ribière formulae}:
+\vspace{5pt}
+$$
+\beta^k_{PR} = \frac{\nabla f^{k^T}(\nabla f^k - \nabla f^{k-1})}{||\nabla f^{k-1}||^2}
+$$
+\end{itemize}
+
+The Fletcher-Reeves formulae has the best theoretical properties whereas the Polak-Ribière is the one showing the best practical behaviour.
+
+\subsubsection*{Global convergence}
+
+The \textit{descent condition} is given by
+
+$$
+{\nabla f^k}^Td^k = -||\nabla f^k||^2 + \beta^k{\nabla f^k}^Td^{k-1} < 0.
+$$
+
+With \textbf{exact line search}, $\al^k = \al^*$ and ${\nabla f^k}^Td^{k-1} = 0$ so that the previous inequality holds.
+
+With \textbf{inexact line search} additional conditions must be imposed to the step length $\al^k$.
+
+\begin{itemize}
+\item \textbf{Fletcher-Reeves}: $d^k_{CG-FR}$ is a descent direction if the step length $\al^k$ satisfies \textit{SWC} with $c_2 < \frac{1}{2}$.
+
+\item \textbf{Polak-Ribière}: The following modifications are needed to guarantee the descent direction property:
+
+\vspace{-5pt}
+
+\begin{enumerate}[label=\roman*.]
+\item A negative $\beta^k_{PR}$ must be avoided, taking $\beta^k_{PR+} = \max(0, \beta^k_{PR}).$
+\item The step length $a^k$ must satisfy \textit{WC} or \textit{SWC} and the sufficient decrease condition (\textit{SDC}):
+$$
+{\nabla f^k}^Td^k \leq -c_3||\nabla f^k||^2, \ 0 < c_3 \leq 1.
+$$
+\end{enumerate}
+\end{itemize}
+
+From a theoretical point of view, the \textit{Convergent Angle Condition} implying $\lim_{k\rightarrow\infty}||\nabla f^k|| = 0$ cannot be proved for Conjugate Gradient methods. However, a somehow weaker result can be established:
+
+\begin{theorem}\label{thm: CG}
+Suppose that $f$ satisfies the conditions of Zoutendijk's theorem. If the Conjugate gradient method is applied with either
+\begin{itemize}
+\item $\beta^k_{FR}$ and $\al^k$ satisfying the \textit{SWC} with $c_2 < \frac{1}{2}$, or
+\item $\beta^k_{PR+}$ and $\al^k$ satisfying the \textit{WC} plus the \textit{SDC},
+\end{itemize}
+then
+$$
+\underset{k\rightarrow\infty}{\lim\inf}\ || \nabla f^k || = 0.
+$$
+\end{theorem}
+
+\subsubsection*{Local convergence}
+
+Restart means to take a gradient step, $d^k = -\nabla f^k$ at every iteration $k$, namely
+
+\begin{itemize}
+\item Every $n$ iterations.
+\item Whenever two consecutive gradients are far from orthogonal:
+$$
+\frac{|{\nabla f^k}^T\nabla f^{k-1}|}{||\nabla f^k||^2} \geq \nu \ \ (\nu \approx 0.1).
+$$
+\end{itemize}
+
+\begin{prop}[$n$-step Quadratic Convergence]
+Suppose the Conjugate Gradient Method is applied according to Theorem \ref{thm: CG} with restart every $n$ iterations. Then,
+$$
+||x^{k+\mathbf{n}} - x^*|| = \mathcal{O}(||x^k-x^*||^2)
+$$
+\end{prop}
+
+
+\subsection{Quasi-Newton Methods}
+
+$$
+\boxed{d^k = -{B^{k}}^{-1}\nabla f^k}
+$$
+
+An iteration of a quasi-Newton method sets $d^k_{QN}$ as the minimizer of a quadratic approximation of $f(x)$ around $x^k$ using an \textbf{approximation of the true hessian $B^k \approx \nabla^2f^k$ without using second derivatives}.
+
+The most popular expression for the matrix $B^k$ is the \textbf{Broyden-Fletcher-Goldfarb-Shanno (BFGS)}.
+
+\subsubsection*{BFGS Update Formulae}
+
+Let $x^{k+1}\leftarrow x^k +\al^kd^k_{QN}$.
+
+Let $f^{k+1}_{QN}(d) = f^{k+1} + {\nabla f^{k+1}}^Td + \frac{1}{2}d^TB^{k+1}d$. How can we make $B^{k+1}$ approximate $\nabla^2f^{k+1}$ based on the information gathered in the last iteration?
+
+\begin{enumerate}[label=\roman*.]
+\item First we \textbf{impose $f^{k+1}_{QN}$ to have the same derivative as $f$ at $x^k$}:
+\vspace{5pt}
+\begin{align*}
+\nabla f^{k+1}_{QN}(-\al^kd^k_{QN}) &= \nabla f^{k+1} - \al^kB^{k+1}d^k_{QN} = \nabla f^k \\
+\nabla f^{k+1} - \nabla f^k &= B^{k+1}\al^kd^k_{QN}.
+\end{align*}
+
+\item Defining $s^k = x^{k+1}-x^k$ and $y^k = \nabla f^{k+1} - \nabla f^k$ and $\mathbf{H^k \overset{\text{def}}{=} {B^k}^{-1}}$, we obtain the \textbf{secant equation} \textit{(SE)}
+\begin{align*}
+B^{k+1}s^k &= y^k \\
+s^k &= H^{k+1}y^k.
+\end{align*}
+
+\item Premultiplying the \textit{(SE)} by $y^k$ we see that in order for $H^{k+1} \succ 0$, $s^k$ and $y^k$ must satisfy the \textbf{curvature condition} \textit{(CC)}:
+$$
+{y^k}^Ts^k > 0.
+$$
+\end{enumerate}
+
+The secant equation has an infinite number of solutions $H^{k+1}$.
+
+\begin{defn}
+Let $\mathbf{H^{k+1}_{BFGS}}$ be the symmetric $n\times n$ matrix satisfying \textit{(SE)} closest to the current matrix $H^k$ with respect to the weighted Frobenius norm.
+\end{defn}
+
+It can be proved that the unique solution is the \textit{BFGS update formulae}:
+
+$$
+H^{k+1}_{BFGS} = (I-\rho^ks^k{y^k}^T)H^k_{BFGS}(I-\rho^ky^k{s^k}^T) + \rho^ks^k{s^k}^T,
+$$
+
+with $\rho^k = \frac{1}{{y^k}^Ts^k}$.
+
+\begin{prop}[Properties of the BFGS update formulae]
+\
+\begin{enumerate}[label=\roman*.]
+\item $H^{k+1}_{BFGS}$ is symmetric.
+\item $H^{k+1}_{BFGS}$ satisfies the secant equation.
+\item $H^{k+1}_{BFGS}$ is positive definite if $\al^k$ satisfies the \textit{WC}.
+\end{enumerate}
+\end{prop}
+
+Finally, the search direction of the BFGS quasi-Newton method is defined as
+
+$$
+\boxed{d^k_{BFGS} \overset{\text{def}}{=} -H^{k}_{BFGS}\nabla f^k}
+$$
+
+\begin{prop}
+Any step length $\al^k$ satisfying the Wolfe conditions guarantees the curvature condition ${y^k}^Ts^k > 0$.
+\begin{proof}
+From \textit{(WC2)} we have that
+$$
+{\nabla f^{k+1}}^Td^k \geq c_2{\nabla f^k}^Td^k.
+$$
+Since $s^k = x^{k+1}-x^k = \al^k d^k$,
+\begin{align*}
+{\nabla f^{k+1}}^T\frac{s^k}{\al^k} &\geq c_2{\nabla f^k}^T\frac{s^k}{\al^k}\\
+(\nabla f^{k+1} - \nabla f^k)^Ts^k &\geq (c_2-1){\nabla f^k}^Ts^k\\
+y^ks^k &\geq (c_2-1){\nabla f^k}^Ts^k\\
+y^ks^k &\geq (c_2-1)\al^k{{\nabla f^k}^Td^k} > 0
+\end{align*}
+\end{proof}
+\end{prop}
+
+\subsubsection*{Global convergence}
+
+It is straightforward to see that the descent condition holds.
+
+\begin{prop}
+If the matrices $H^k \succ 0$ with an uniformly bounded condition number, i.e. $\kappa(H^k) \leq M, \ M > 0, \ \forall k$, then $\cos\theta^k \geq \frac{1}{M}$.
+\end{prop}
+
+\subsubsection*{Local convergence}
+
+\begin{theorem}
+Let $\{x^k\}_{k\geq 0}$ be the iterates generated by the BFGS method converging to a minimizer $x^*$ of a function $f \in\C^2$. Suppose that $\nabla^2 f(x^*)$ is Lipschitz continuous and that the sequence $||x^k - x^* || \underset{k\rightarrow\infty}{\longrightarrow}0$ rapidly enough. Then, $\{x^k\}\underset{k\rightarrow\infty}{\longrightarrow}x^*$ \textbf{with superlinear order of convergence}.
+\end{theorem}
+
+\newpage
+
+
+
+\section{Second Derivative Methods}
+
+
+\subsection{Newton's Method}
+
+$$
+\boxed{p^k = - {\nabla^2f^k}^{-1}\nabla f^k, \ (\al^k = 1)}
+$$
+
+The global convergence of Newton's Method can only be guaranteed if $\nabla^2f^k \succ 0 \  \forall k$, which ensures that $p^k$ is a descent direction $\forall k$.
+
+\begin{theorem}
+Suppose that $f \in \C^2$ and that the Hessian $\nabla^2f(x)$ is Lipschitz continuous in a neighbourhood of a solution $x^*$ at which the \textit{SOSC} are satisfied (i.e. $\nabla f^* = 0, \nabla^2f^* \succ 0)$. Consider the sequence $\{x^k\}_{k\geq 0}$ with $x^{k+1} = x^k -{\nabla^2f^k}^{-1}\nabla f^k$. If the starting point $x^0$ is sufficiently close to $x^*$, then:
+
+\begin{enumerate}[label=\roman*.]
+\item $\{x^k\} \rightarrow x^*$.
+\item \textbf{The order of convergence of $\{x^k\}_{k\geq 0}$ is quadratic}.
+\item The sequence of gradient norms $\{ ||\nabla f^k|| \}_{k\geq 0}$ converges quadratically to zero.
+\end{enumerate}
+
+\end{theorem}
+
+
+\subsection{Modified Newton's Method}
+
+$$
+\boxed{d^k = -(\nabla^2f^k + E^k)^{-1}\nabla f^k }
+$$
+
+In order for Newton's Method to become a practical optimization algorithm we must modify the Hessian matrix $B^k \approx \nabla^2f^k$ ensuring that:
+
+\begin{itemize}
+\item While $x^k$ is far from $x^*$, $B^k \succ 0$ so that $d^k = - {B^k}^{-1}\nabla f^k$ is a descent direction $\forall k$, hence acheiving global convergence.
+\item When $x^k$ is near to $x^*$, $B^k$ resembles the true Hessian, hence preserving the quadratic order of convergence.
+\end{itemize}
+
+\begin{defn}[Condition number]
+Let $A$ be a symmetric $n\times n$ positive definite matrix with eigenvalues $0<\lambda_1\leq\lambda_2\leq\dots\leq\lambda_n$. The condition number of $A$ is $\kappa(A) = || A||_2 || A^{-1} ||_2 = \lambda_n/\lambda_1$.
+\end{defn}
+
+\subsubsection*{Global convergence}
+
+\begin{theorem}\label{thm: MNM}
+Let $f$ be bounded below and twice continuously differentiable in an open set $\N$ containing the level set $\mathcal{L} = \{x | f(x) \leq f(x^0)\}$ where $\nabla f$ is Lipschitz continuous. Then, if the Modified Newton Method started at $x^0$ and the bounded modified condition holds,
+$$
+\kappa(B^k) \leq C, \ C > 0, \ \forall k
+$$
+the algorithm converges to a stationary point, that is
+$$
+\lim_{k\rightarrow\infty}\nabla f^k = 0.
+$$
+
+\begin{proof}
+As we have seen with the \textit{BFGS} method, if $B^k \succ 0$ and $\kappa(B^k) \leq C, \ C > 0, \ \forall k$, then $\cos\theta^k \geq \frac{1}{C}$.
+\end{proof}
+
+\end{theorem}
+
+\begin{prop}
+If, in addition to the hypothesis of Theorem \ref{thm: MNM}, $E^* = 0$ at the optimal solution $x^*$, then $\nabla^2f^* \succ 0$ and the algorithm converges to a strict local minimizer.
+\end{prop}
+
+\subsubsection*{Local convergence}
+
+\begin{theorem}[Unit step length]
+Let $f \in \C^2$ in an open set $\N$. Consider the iteration $x^{n+1}\leftarrow x^k + \al^kd^k$ with $d^k$ descent direction and $\al^k$ satisfying the \textit{WC} with $c_1 < \frac{1}{2}$. If the sequence $\{x^k\}_{k\geq 0}$ converges to a point $x^* \in \N$ such that $\nabla^2f^* \succ 0$ and
+$$
+\lim_{k\rightarrow\infty}\frac{||\nabla f^k + \nabla^2f^kd^k ||}{||d^k||} = 0
+$$
+then $\exists k_0 \geq 0 \ | \ \al^k \in WC \ \forall k \geq k_0$.
+\end{theorem}
+
+\begin{theorem}
+Let $f\in\C^2$ in an open set $\N$. Consider that the Modified Newton Method with $c_1 < \frac{1}{2}$ converges to $x^* \in \N$ and that
+\begin{enumerate}[label=\roman*.]
+\item The \textit{SOSC} are satisfied at $x^*$.
+\item The Hessian $\nabla^2f$ is Lipschitz continuous in a neighbourhood of $x^*$.
+\item $E^k = 0$ for $k$ large enough.
+\end{enumerate}
+Then the \textbf{order of convergence is quadratic}.
+\end{theorem}
+
+\subsubsection*{Spectral decomposition of $\nabla^2f^k$}
+
+\begin{theorem}
+Let $A\in\R^{n\times n}$, symmetric, then:
+\begin{enumerate}[label=\roman*.]
+\item $A$ has $n$ real eigenvalues $\lambda_1 \leq \dots \leq \lambda_n$.
+\item There exists an orthonormal basis of eigenvectors $Q = [q_1, \dots, q_n]$.
+\item $A$ diagonalizes, $A = Q\Lambda Q^T$.
+\end{enumerate}
+\end{theorem}
+
+Based on the spectral decomposition $\nabla^2f^k = Q\Lambda Q^T$ we define
+$B^k \overset{\text{def}}{=} Q\tilde{\Lambda}Q^T$ with
+\vspace{-5pt}
+$$
+\tilde{\Lambda} = diag(\max(\delta, \lambda_i)) = \Lambda + \overbrace{diag(\max(0, \delta - \lambda_i))}^{\Delta\Lambda}
+$$
+
+so that
+\vspace{-5pt}
+$$
+B^k = \overbrace{Q\Lambda Q^T}^{\nabla^2f^k} + \overbrace{Q(\Delta\Lambda)Q^T}^{E^k}
+$$
+
+\subsubsection*{Cholesky factorization of $\nabla^2f^k$}
+
+\begin{theorem}
+Let $A\in\R^{n\times n}$, symmetric and $A\succ 0$. Then there exists a unique upper-triangular matrix $R$ with positive diagonal entries such that $A = R^TR$.
+\end{theorem}
+
+\begin{note} The Cholesky factorization may not exist for a non positive definite Hessian. Moreover, even if it is positive definite, if it is \textit{ill conditioned}, the computation of the factorization can be unstable.
+\end{note}
+
+Perhaps the simplest idea is to find a scalar $\tau > 0$ such that $\nabla^2f^k + \tau I$ is sufficiently positive definite. \textit{Cholesky with Added Multiple of the Identity} follows this approach.
+
+\begin{note}
+The largest eigenvalue (in absolute value) of $\nabla^2f^k$ is bounded by the Frobenius norm $|| \nabla^2f^k ||_F \overset{\text{def}}{=} \sqrt{\sum_i\sum_j(\nabla^2f^k_{ij})^2}$.
+\end{note}
+
+
+
+\end{document}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+Suppose that $f \in \C^2$ and that $\{ x^k \}_{k\geq 0}$ is the sequence of iterates generated by the gradient method \textit{with exact line searches} that converges to the stationary point $x^*$ where $\nabla^2f^*$ is positive definite. Then,
+$$
+f^{k+1}-f^* \leq \bigg(\frac{\lambda_n-\lambda_1}{\lambda_n+\lambda_1}\bigg)^2(f^k-f^*)
+$$
+where $0 < \lambda_1 \leq \dots \leq \lambda_n$ are the eigenvalues of $\nabla^2f^*$.
+\end{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+$$
+r^k = \lim_{k\rightarrow \infty} \frac{\lVert x^{k+1}-x^{*}\lVert}{\lVert x^{k}-x^{*}\lVert} = \frac{\lVert \nabla f^{k+1}\lVert}{\lVert \nabla f^{k}\lVert}
+$$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider the function $f : \R^n \rightarrow \R$. The vector of first derivatives -\textit{the gradient}- is defined as
+
+$$
+\nabla f(x) = \begin{pmatrix}
+\frac{\partial f}{\partial x_1} \\
+\vdots \\
+\frac{\partial f}{\partial x_n}
+\end{pmatrix}
+$$
